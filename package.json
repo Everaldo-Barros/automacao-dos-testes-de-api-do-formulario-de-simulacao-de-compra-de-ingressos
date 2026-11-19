@@ -1,0 +1,29 @@
+{
+  "name": "automacao-dos-testes-de-api-do-formulario-de-simulacao-de-compra-de-ingressos",
+  "version": "1.0.0",
+  "description": "Este repositório armazena os testes da api do formulário que simula a compra de ingressos para jogos de futebol.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Everaldo-Barros/automacao-dos-testes-de-api-do-formulario-de-simulacao-de-compra-de-ingressos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Everaldo-Barros/automacao-dos-testes-de-api-do-formulario-de-simulacao-de-compra-de-ingressos/issues"
+  },
+  "homepage": "https://github.com/Everaldo-Barros/automacao-dos-testes-de-api-do-formulario-de-simulacao-de-compra-de-ingressos#readme",
+  "devDependencies": {
+    "cypress": "^16.3.0"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  }
+}
