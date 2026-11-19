@@ -17,7 +17,7 @@ jobs:
       - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Instalar dependências do projeto
         run: npm ci
@@ -26,7 +26,7 @@ jobs:
         run: |
           node servidor.js &
           echo "Servidor iniciado, aguardando..."
-          sleep 30
+          sleep 15
 
       - name: Verificar se servidor está respondendo
         run: |
@@ -40,8 +40,4 @@ jobs:
           done
 
       - name: Executar testes do Cypress
-        uses: cypress-io/github-action@v6
-        with:
-          command: npx cypress run
-          start: ""
-          wait-on: false
+        run: npx cypress run
