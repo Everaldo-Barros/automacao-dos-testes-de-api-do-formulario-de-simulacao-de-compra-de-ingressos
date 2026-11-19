@@ -29,8 +29,8 @@ app.get('/api/acessar-formulario', (req, res) => {
 const JOGOS_VALIDOS = [
   { nome: "Flamengo x Santos — 15/12/2026 · 16h00", data: new Date("2026-12-15T16:00:00") },
   { nome: "Palmeiras x Grêmio — 27/12/2026 · 19h30", data: new Date("2026-12-27T19:30:00") },
-  { nome: "Corinthians x Bahia — 05/01/2027 · 21h00", data: new Date("2027-01-05T21:00:00") },
-  { nome: "Cruzeiro x Vasco — 12/01/2027 · 15h00", data: new Date("2027-01-12T15:00:00") }
+  { nome: "Corinthians x São Paulo — 03/12/2026 · 20h00", data: new Date("2026-12-03T20:00:00") },
+  { nome: "Botafogo x Vasco — 10/12/2026 · 18h00", data: new Date("2026-12-10T18:00:00") }
 ];
 
 const NOMES_JOGOS_VALIDOS = JOGOS_VALIDOS.map(j => j.nome);

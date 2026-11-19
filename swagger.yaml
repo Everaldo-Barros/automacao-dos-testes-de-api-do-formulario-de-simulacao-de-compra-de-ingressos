@@ -1,0 +1,437 @@
+openapi: 3.0.0
+info:
+  title: API de Reserva de Ingressos
+  description: |
+    API didática para simulação de reserva de ingressos.
+    Valida os campos do formulário e retorna confirmação.
+    Suporta criação, consulta, atualização e cancelamento de reservas.
+  version: 1.3.0
+  contact:
+    name: Everaldo Barros
+    url: https://everaldo-barros.github.io/formulario-reserva-de-ingressos/
+servers:
+  - url: http://localhost:3000
+    description: Servidor Local
+tags:
+  - name: Formulário
+    description: Acesso, validação e envio do formulário de reserva
+  - name: Reservas
+    description: Consulta, atualização e cancelamento de reservas
+  - name: Jogos
+    description: Lista de jogos disponíveis para reserva
+paths:
+  /api/acessar-formulario:
+    get:
+      tags:
+        - Formulário
+      summary: Obter informações do formulário
+      description: Retorna os campos esperados e instruções de preenchimento
+      responses:
+        '200':
+          description: Dados do formulário retornados com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
+                  mensagem:
+                    type: string
+                    example: "Formulário carregado com sucesso"
+                  camposEsperados:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - nomeCompleto
+                      - email
+                      - telefone
+                      - jogo
+                      - setor
+                      - quantidade
+                      - formaPagamento
+                      - pedidoEspecial
+                  instrucoes:
+                    type: string
+                    example: "Preencha todos os campos obrigatórios antes de enviar"
+                  dataAtual:
+                    type: string
+                    format: date
+                    example: "19/11/2026"
+  /api/jogos:
+    get:
+      tags:
+        - Jogos
+      summary: Listar jogos disponíveis
+      description: Retorna a lista de jogos com data, horário e opções de setores
+      responses:
+        '200':
+          description: Lista de jogos retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
+                  quantidade:
+                    type: integer
+                    example: 4
+                  jogos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nome:
+                          type: string
+                          example: "Flamengo x Santos — 15/12/2026 · 16h00"
+                        setores:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              nome:
+                                type: string
+                                example: "Arquibancada"
+                              valor:
+                                type: number
+                                example: 80.00
+  /api/enviar-formulario:
+    post:
+      tags:
+        - Formulário
+      summary: Enviar formulário de reserva
+      description: |
+        Recebe os dados preenchidos no formulário, valida cada campo
+        e cria uma nova reserva se tudo estiver correto.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nomeCompleto
+                - email
+                - telefone
+                - jogo
+                - setor
+                - quantidade
+                - formaPagamento
+              properties:
+                nomeCompleto:
+                  type: string
+                  description: Nome completo do comprador
+                  minLength: 3
+                  example: "Maria Silva"
+                email:
+                  type: string
+                  format: email
+                  description: E-mail para confirmação
+                  example: "maria.silva@email.com"
+                telefone:
+                  type: string
+                  description: Telefone com DDD
+                  pattern: "^\\d{10,11}$"
+                  example: "49999991234"
+                jogo:
+                  type: string
+                  description: Jogo selecionado na lista
+                  example: "Flamengo x Santos — 15/12/2026 · 16h00"
+                setor:
+                  type: string
+                  description: Setor escolhido no estádio
+                  example: "Arquibancada — R$ 80,00"
+                quantidade:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  description: Número de ingressos desejados
+                  example: 2
+                formaPagamento:
+                  type: string
+                  description: Opção de pagamento
+                  enum:
+                    - PIX
+                    - Cartão de Crédito
+                    - Boleto Bancário
+                  example: "PIX"
+                pedidoEspecial:
+                  type: string
+                  description: Necessidades especiais (opcional)
+                  maxLength: 200
+                  example: "Nenhum"
+      responses:
+        '201':
+          description: Reserva criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
+                  mensagem:
+                    type: string
+                    example: "Reserva realizada com sucesso! Confira seu e-mail."
+                  reserva:
+                    type: object
+                    properties:
+                      codigo:
+                        type: string
+                        example: "RES-1795111629888"
+                      dataReserva:
+                        type: string
+                        format: date-time
+                        example: "2026-11-19T15:30:00.000Z"
+                  dadosConfirmados:
+                    type: object
+                    properties:
+                      nomeCompleto:
+                        type: string
+                        example: "Maria Silva"
+                      jogo:
+                        type: string
+                        example: "Flamengo x Santos — 15/12/2026 · 16h00"
+                      setor:
+                        type: string
+                        example: "Arquibancada — R$ 80,00"
+                      quantidade:
+                        type: integer
+                        example: 2
+                      valorUnitario:
+                        type: number
+                        example: 80.00
+                      valorTotal:
+                        type: number
+                        example: 160.00
+                      formaPagamento:
+                        type: string
+                        example: "PIX"
+        '400':
+          description: Validação falhou — um ou mais campos estão incorretos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: false
+                  mensagem:
+                    type: string
+                    example: "Verifique os campos abaixo antes de enviar"
+                  totalErros:
+                    type: integer
+                    example: 2
+                  erros:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campo:
+                          type: string
+                          example: "email"
+                        mensagem:
+                          type: string
+                          example: "Informe um e-mail válido"
+  /api/reserva/{codigo}:
+    get:
+      tags:
+        - Reservas
+      summary: Consultar dados de uma reserva
+      description: Retorna todos os dados de uma reserva pelo código
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          description: Código gerado no momento da reserva
+          schema:
+            type: string
+            example: "RES-1795111629888"
+      responses:
+        '200':
+          description: Reserva encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
+                  reserva:
+                    type: object
+                    properties:
+                      codigo:
+                        type: string
+                        example: "RES-1795111629888"
+                      nomeCompleto:
+                        type: string
+                        example: "Maria Silva"
+                      email:
+                        type: string
+                        example: "maria.silva@email.com"
+                      telefone:
+                        type: string
+                        example: "49999991234"
+                      jogo:
+                        type: string
+                        example: "Flamengo x Santos — 15/12/2026 · 16h00"
+                      setor:
+                        type: string
+                        example: "Arquibancada — R$ 80,00"
+                      quantidade:
+                        type: integer
+                        example: 2
+                      valorTotal:
+                        type: number
+                        example: 160.00
+                      formaPagamento:
+                        type: string
+                        example: "PIX"
+                      pedidoEspecial:
+                        type: string
+                        example: "Nenhum"
+                      dataReserva:
+                        type: string
+                        format: date-time
+                        example: "2026-11-19T15:30:00.000Z"
+        '404':
+          description: Reserva não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: false
+                  mensagem:
+                    type: string
+                    example: "Reserva não encontrada. Verifique o código informado."
+    put:
+      tags:
+        - Reservas
+      summary: Atualizar dados de uma reserva
+      description: |
+        Permite alterar dados de uma reserva já criada.
+        Não é possível alterar o jogo após a reserva ser criada.
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          description: Código da reserva a ser atualizada
+          schema:
+            type: string
+            example: "RES-1795111629888"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nomeCompleto:
+                  type: string
+                  example: "Maria Silva"
+                email:
+                  type: string
+                  example: "maria.silva@email.com"
+                telefone:
+                  type: string
+                  example: "49999991234"
+                setor:
+                  type: string
+                  example: "Setor VIP — R$ 300,00"
+                quantidade:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  example: 3
+                formaPagamento:
+                  type: string
+                  enum:
+                    - PIX
+                    - Cartão de Crédito
+                    - Boleto Bancário
+                  example: "Cartão de Crédito"
+                pedidoEspecial:
+                  type: string
+                  example: "Lugar para acompanhante"
+      responses:
+        '200':
+          description: Reserva atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
+                  mensagem:
+                    type: string
+                    example: "Reserva atualizada com sucesso!"
+                  reserva:
+                    type: object
+                    properties:
+                      valorAnterior:
+                        type: number
+                        example: 160.00
+                      valorAtual:
+                        type: number
+                        example: 900.00
+                  dadosAtualizados:
+                    type: object
+                    properties:
+                      setor:
+                        type: string
+                        example: "Setor VIP — R$ 300,00"
+                      quantidade:
+                        type: integer
+                        example: 3
+                      formaPagamento:
+                        type: string
+                        example: "Cartão de Crédito"
+        '404':
+          description: Reserva não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: false
+                  mensagem:
+                    type: string
+                    example: "Reserva não encontrada"
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: false
+                  mensagem:
+                    type: string
+                    example: "Verifique os campos abaixo"
+                  totalErros:
+                    type: integer
+                    example: 1
+                  erros:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campo:
+                          type: string
+                          example: "quantidade"
