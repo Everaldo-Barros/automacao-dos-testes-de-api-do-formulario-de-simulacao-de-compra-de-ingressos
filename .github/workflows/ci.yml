@@ -22,20 +22,26 @@ jobs:
       - name: Instalar dependências do projeto
         run: npm ci
 
-      - name: Iniciar servidor em segundo plano
-        run: node servidor.js &
+      - name: Iniciar servidor
+        run: |
+          node servidor.js &
+          echo "Servidor iniciado, aguardando..."
+          sleep 30
 
-      - name: Aguardar servidor ficar disponível
-        uses: fountainhead/action-wait-for-check@v1.2.0
-        with:
-          url: http://localhost:3000/api/jogos
-          timeout: 30000
-          interval: 2000
+      - name: Verificar se servidor está respondendo
+        run: |
+          for i in {1..10}; do
+            if curl -s http://localhost:3000/api/jogos > /dev/null; then
+              echo "Servidor está respondendo!"
+              break
+            fi
+            echo "Aguardando servidor... tentativa $i de 10"
+            sleep 3
+          done
 
       - name: Executar testes do Cypress
         uses: cypress-io/github-action@v6
         with:
-          build: false
+          command: npx cypress run
           start: ""
           wait-on: false
-          command: npx cypress run
